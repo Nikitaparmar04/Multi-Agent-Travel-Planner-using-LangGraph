@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TripMind — AI Travel Planner</title>
+  <meta name="description" content="Plan your perfect trip with TripMind, your intelligent multi-agent AI travel assistant. Get personalized itineraries, weather info, and more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="bg-layer" id="bgLayer">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="stars" id="stars"></div>
+  </div>
+
+  <!-- App Shell -->
+  <div class="app-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon">✈️</div>
+          <span class="brand-name">TripMind</span>
+        </div>
+        <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">✕</button>
+      </div>
+
+      <button class="new-chat-btn" id="newChatBtn">
+        <span class="plus-icon">＋</span>
+        New Trip Plan
+      </button>
+
+      <div class="chat-history-label">Recent Trips</div>
+      <ul class="chat-history" id="chatHistory">
+        <!-- dynamically populated -->
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="model-badge">
+          <span class="dot"></span>
+          Groq · LLaMA 3
+        </div>
+        <div class="sidebar-version">v1.0 · Multi-Agent</div>
+      </div>
+    </aside>
+
+    <!-- Main Area -->
+    <main class="main-area">
+
+      <!-- Top Bar -->
+      <header class="topbar">
+        <button class="menu-btn" id="menuBtn" aria-label="Open sidebar">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="topbar-title">
+          <h1>AI Travel Planner</h1>
+          <span class="topbar-sub">Powered by Multi-Agent Intelligence</span>
+        </div>
+        <div class="agent-status" id="agentStatus">
+          <span class="status-dot"></span>
+          <span class="status-label">Ready</span>
+        </div>
+      </header>
+
+      <!-- Chat Window -->
+      <div class="chat-container" id="chatContainer">
+
+        <!-- Welcome Screen (shown when no messages) -->
+        <div class="welcome-screen" id="welcomeScreen">
+          <div class="welcome-icon">🌍</div>
+          <h2 class="welcome-title">Where would you like to go?</h2>
+          <p class="welcome-sub">I can help you plan itineraries, check weather, convert currencies, find attractions, and much more.</p>
+          <div class="suggestions-grid" id="suggestionsGrid">
+            <button class="suggestion-card" data-prompt="Plan a 7-day trip to Japan including Tokyo, Kyoto and Osaka with budget estimation.">
+              <span class="sug-icon">🗾</span>
+              <span class="sug-title">Japan in 7 Days</span>
+              <span class="sug-desc">Tokyo · Kyoto · Osaka with budget</span>
+            </button>
+            <button class="suggestion-card" data-prompt="What's the weather like in Paris this week? Is it a good time to visit?">
+              <span class="sug-icon">🌤️</span>
+              <span class="sug-title">Paris Weather Check</span>
+              <span class="sug-desc">Best time & current forecast</span>
+            </button>
+            <button class="suggestion-card" data-prompt="Convert 1000 USD to EUR and INR for my Europe trip.">
+              <span class="sug-icon">💱</span>
+              <span class="sug-title">Currency Converter</span>
+              <span class="sug-desc">USD → EUR, INR for Europe</span>
+            </button>
+            <button class="suggestion-card" data-prompt="Find top tourist attractions, restaurants and hidden gems in Bali, Indonesia.">
+              <span class="sug-icon">🏝️</span>
+              <span class="sug-title">Explore Bali</span>
+              <span class="sug-desc">Attractions · Food · Hidden gems</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="messages" id="messages"></div>
+
+      </div>
+
+      <!-- Input Area -->
+      <div class="input-area">
+        <div class="input-wrapper">
+          <div class="input-extras">
+            <button class="extra-btn" title="Attach file" aria-label="Attach file" disabled>📎</button>
+          </div>
+          <textarea
+            id="queryInput"
+            class="query-input"
+            placeholder="Ask me anything about your trip..."
+            rows="1"
+            aria-label="Trip planning query"
+          ></textarea>
+          <button class="send-btn" id="sendBtn" aria-label="Send message">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+        <p class="input-hint">TripMind uses AI — always verify critical travel details before booking.</p>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Agent Thinking Overlay (for mobile) -->
+  <div class="thinking-toast" id="thinkingToast">
+    <div class="thinking-dots">
+      <span></span><span></span><span></span>
+    </div>
+    <span>Agents working…</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
