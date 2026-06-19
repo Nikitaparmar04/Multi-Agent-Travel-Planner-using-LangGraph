@@ -1,9 +1,10 @@
 import os
-from dotenv import load_dotenv
-load_dotenv()
 import requests
+from dotenv import load_dotenv
 from langchain.tools import tool
 from typing import List
+
+load_dotenv()
 
 
 class CurrencyConverterTool:
@@ -17,12 +18,12 @@ class CurrencyConverterTool:
         @tool
         def convert_currency(amount: float, from_currency: str, to_currency: str) -> str:
             """Convert an amount from one currency to another.
-            
+
             Args:
                 amount: The amount to convert.
                 from_currency: The source currency code (e.g. USD, EUR, INR).
                 to_currency: The target currency code (e.g. USD, EUR, INR).
-            
+
             Returns:
                 A string with the converted amount.
             """

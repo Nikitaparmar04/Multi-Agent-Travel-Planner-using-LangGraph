@@ -68,4 +68,4 @@ class CalculatorTool:
             estimate_total_hotel_cost,
             calculate_total_expense,
             calculate_daily_expense_budget,
-        ]
+        ]

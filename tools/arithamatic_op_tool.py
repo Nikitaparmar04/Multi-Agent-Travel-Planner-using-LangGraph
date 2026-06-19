@@ -1,8 +1,11 @@
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
-from langchain.tools import tool
-from langchain_community.utilities.alpha_vantage import AlphaVantageAPIWrapper
+
+from langchain.tools import tool  # noqa: E402
+from langchain_community.utilities.alpha_vantage import AlphaVantageAPIWrapper  # noqa: E402
+
 
 @tool
 def multiply(a: int, b: int) -> int:
@@ -18,6 +21,7 @@ def multiply(a: int, b: int) -> int:
     """
     return a * b
 
+
 @tool
 def add(a: int, b: int) -> int:
     """
@@ -32,8 +36,10 @@ def add(a: int, b: int) -> int:
     """
     return a + b
 
+
 @tool
-def currency_converter(from_curr: str, to_curr: str, value: float)->float:
+def currency_converter(from_curr: str, to_curr: str, value: float) -> float:
+    """Convert currency using AlphaVantage exchange rates."""
     os.environ["ALPHAVANTAGE_API_KEY"] = os.getenv('ALPHAVANTAGE_API_KEY')
     alpha_vantage = AlphaVantageAPIWrapper()
     response = alpha_vantage._get_exchange_rate(from_curr, to_curr)

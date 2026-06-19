@@ -7,7 +7,6 @@ The LLM, tool wrappers, and LangGraph internals are all mocked so that:
   - We verify the graph is wired correctly (nodes, edges, compilation).
 """
 
-import pytest
 from unittest.mock import MagicMock, patch
 from langchain_core.tools import tool
 

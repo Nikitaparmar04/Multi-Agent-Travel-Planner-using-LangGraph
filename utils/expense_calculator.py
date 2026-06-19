@@ -23,5 +23,3 @@ class Calculator:
         days = int(float(days))
 
         return total / days if days > 0 else 0
-    
-    

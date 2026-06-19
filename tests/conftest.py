@@ -5,7 +5,7 @@ Fixtures here are automatically available to all test files without importing.
 """
 
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 
 # ---------------------------------------------------------------------------

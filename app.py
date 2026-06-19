@@ -4,7 +4,6 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from agent.agentic_workflow import GraphBuilder
 import traceback
-import os
 
 app = FastAPI(
     title="TripMind API",

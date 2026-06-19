@@ -242,9 +242,9 @@ class TestCalculatorToolIntegration:
 
     def test_total_expense_combines_multiple_costs(self):
         """Total expense tool should sum all given costs correctly.
-        
+
         Note: calculate_total_expense uses *costs (varargs), so we call the
-        underlying Calculator directly to test the integration of tool→utility.
+        underlying Calculator directly to test the integration of tool->utility.
         """
         from tools.expense_calculator_tool import CalculatorTool
         calc_tool_obj = CalculatorTool()
@@ -396,7 +396,7 @@ class TestAgentPipelineIntegration:
 
     def test_graph_invoke_returns_messages_dict(self):
         """graph.invoke() should return a dict with a 'messages' key.
-        
+
         LangGraph requires proper message objects (HumanMessage/AIMessage),
         not plain strings or MagicMocks.
         """
@@ -546,7 +546,7 @@ class TestFastAPIEndpointIntegration:
 
     def test_query_endpoint_returns_200(self, api_client):
         """POST /query with a valid query must return HTTP 200.
-        
+
         LangGraph requires real AIMessage objects. We mock graph.invoke at
         the pregel level to return a pre-built messages dict.
         """
@@ -655,9 +655,9 @@ class TestCrossToolDataFlowIntegration:
         """
         Output of estimate_total_hotel_cost (float) must be directly usable
         as input to calculate_total_expense.
-        
-        Note: calculate_total_expense uses *costs varargs — we call the
-        underlying Calculator utility to test the full tool→utility pipeline.
+
+        Note: calculate_total_expense uses *costs varargs - we call the
+        underlying Calculator utility to test the full tool->utility pipeline.
         """
         from tools.expense_calculator_tool import CalculatorTool
         obj = CalculatorTool()

@@ -1,7 +1,7 @@
 from langchain_core.messages import SystemMessage
 
 SYSTEM_PROMPT = SystemMessage(
-    content = """
+    content="""
 You are a helpful AI Travel Agent and Expense Planner.
 You help users plan trips to any place worldwide with real-time data from internet.
 
@@ -24,5 +24,4 @@ Give full information immediately including:
 Use the available tools to gather information and make detailed cost breakdowns.
 Provide everything in one comprehensive response formatted in clean Markdown.
 """
-   
 )
