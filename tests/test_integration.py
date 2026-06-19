@@ -347,7 +347,9 @@ class TestPlaceSearchToolIntegration:
 
     def test_search_attractions_uses_google_on_success(self):
         """When Google succeeds, result should mention 'google'."""
-        with patch("utils.place_info_search.GooglePlaceSearchTool.google_search_attractions") \
+        with patch("utils.place_info_search.GooglePlacesAPIWrapper"), \
+             patch("utils.place_info_search.GooglePlacesTool"), \
+             patch("utils.place_info_search.GooglePlaceSearchTool.google_search_attractions") \
                 as mock_google:
             mock_google.return_value = ["Eiffel Tower", "Louvre Museum"]
 
@@ -362,7 +364,9 @@ class TestPlaceSearchToolIntegration:
 
     def test_search_attractions_falls_back_to_tavily_on_google_failure(self):
         """When Google raises an exception, Tavily fallback should be used."""
-        with patch("utils.place_info_search.GooglePlaceSearchTool.google_search_attractions",
+        with patch("utils.place_info_search.GooglePlacesAPIWrapper"), \
+             patch("utils.place_info_search.GooglePlacesTool"), \
+             patch("utils.place_info_search.GooglePlaceSearchTool.google_search_attractions",
                    side_effect=Exception("API quota exceeded")), \
              patch("utils.place_info_search.TavilyPlaceSearchTool.tavily_search_attractions",
                    return_value=["Colosseum", "Vatican"]):
