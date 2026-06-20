@@ -27,7 +27,7 @@ env:
   AWS_REGION:         us-east-1
   ECR_REPOSITORY:     tripmind-app
   ECS_SERVICE:        tripmind-live-service
-  ECS_CLUSTER:        tripmind-live-cluster
+  ECS_CLUSTER:        tripmind-llmops-cluster
   ECS_TASK_DEFINITION: .github/workflows/task_definition.json
   CONTAINER_NAME:     tripmind-live-container
 
