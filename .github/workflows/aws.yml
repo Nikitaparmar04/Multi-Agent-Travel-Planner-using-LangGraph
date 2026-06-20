@@ -1,0 +1,155 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# CD Pipeline — CI/CD to ECS Fargate
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Triggers  : after "CI" workflow completes successfully on main branch
+# Jobs      : check-status → build-and-push → deploy
+# Registry  : Amazon ECR
+# Compute   : AWS ECS Fargate
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: CI/CD to ECS Fargate
+
+on:
+  # Runs automatically after the CI workflow finishes
+  workflow_run:
+    workflows: ["CI"]           # Must match the "name" field in ci.yml
+    branches:
+      - main
+    types:
+      - completed
+
+  # Allow manual trigger from GitHub Actions UI
+  workflow_dispatch:
+
+# ── Global Environment Variables ──────────────────────────────────────────────
+env:
+  AWS_REGION:         us-east-1
+  ECR_REPOSITORY:     tripmind-app
+  ECS_SERVICE:        tripmind-live-service
+  ECS_CLUSTER:        tripmind-live-cluster
+  ECS_TASK_DEFINITION: .github/workflows/task_definition.json
+  CONTAINER_NAME:     tripmind-live-container
+
+# ── Permissions (required for OIDC token-based AWS auth) ──────────────────────
+permissions:
+  id-token: write     # needed for aws-actions/configure-aws-credentials OIDC
+  contents: read
+
+# ─────────────────────────────────────────────────────────────────────────────
+jobs:
+
+  # ── Job 1: Check CI Status ───────────────────────────────────────────────────
+  # Skip deployment if the upstream CI workflow failed
+  check-status:
+    name: Check CI Status
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fail if CI workflow failed
+        if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success' }}
+        run: |
+          echo "❌ CI workflow did not succeed. Deployment skipped."
+          echo "CI conclusion: ${{ github.event.workflow_run.conclusion }}"
+          exit 1
+
+      - name: CI passed — proceeding to deploy
+        run: echo "✅ CI workflow succeeded. Starting deployment..."
+
+  # ── Job 2: Build & Push Docker Image to ECR ──────────────────────────────────
+  build-and-push:
+    name: Build & Push Docker Image
+    needs: [check-status]
+    runs-on: ubuntu-latest
+
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Push Docker Image
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG:    ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+
+          echo "🐳 Building Docker image..."
+          docker build -t $IMAGE_URI .
+
+          echo "📤 Pushing image to ECR..."
+          docker push $IMAGE_URI
+
+          # Also tag as latest
+          docker tag $IMAGE_URI $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+          echo "image=$IMAGE_URI" >> $GITHUB_OUTPUT
+          echo "✅ Image pushed: $IMAGE_URI"
+
+  # ── Job 3: Deploy to ECS Fargate ─────────────────────────────────────────────
+  deploy:
+    name: Deploy to ECS Fargate
+    needs: [build-and-push]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Download Task Definition from ECS
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ env.CONTAINER_NAME }} \
+            --query taskDefinition \
+            > ${{ env.ECS_TASK_DEFINITION }}
+
+      - name: Update ECS Task Definition with New Image
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition:  ${{ env.ECS_TASK_DEFINITION }}
+          container-name:   ${{ env.CONTAINER_NAME }}
+          image:            ${{ needs.build-and-push.outputs.image }}
+
+      - name: Deploy to Amazon ECS Service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition:          ${{ steps.task-def.outputs.task-definition }}
+          service:                  ${{ env.ECS_SERVICE }}
+          cluster:                  ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      - name: Deployment Success
+        run: |
+          echo "🚀 Deployment complete!"
+          echo "Image: ${{ needs.build-and-push.outputs.image }}"
+          echo "Service: ${{ env.ECS_SERVICE }}"
+          echo "Cluster: ${{ env.ECS_CLUSTER }}"

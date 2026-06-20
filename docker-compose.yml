@@ -1,0 +1,50 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Multi-Agent Trip Planner — docker-compose.yml
+# Services  : api (FastAPI), frontend (Nginx static)
+# ─────────────────────────────────────────────────────────────────────────────
+
+version: "3.9"
+
+services:
+
+  # ── FastAPI Backend ──────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: tripmind-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env                        # your real API keys go here
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PORT=8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - tripmind-net
+
+  # ── Frontend (Nginx static server) ──────────────────────────────────────────
+  frontend:
+    image: nginx:alpine
+    container_name: tripmind-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - api
+    networks:
+      - tripmind-net
+
+networks:
+  tripmind-net:
+    driver: bridge

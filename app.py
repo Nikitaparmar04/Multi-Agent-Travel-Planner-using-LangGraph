@@ -25,12 +25,24 @@ class QueryRequest(BaseModel):
     query: str
 
 
-# Health Check Endpoint
+# Root Endpoint
 @app.get("/")
-async def health():
+async def root():
     return {
         "status": "ok",
         "service": "TripMind API"
+    }
+
+
+# ── Dedicated Health Check Endpoint (used by Docker HEALTHCHECK) ──────────────
+# Docker hits this endpoint every 30s to verify the app is alive.
+# Returns 200 OK when healthy — any non-2xx causes the container to go unhealthy.
+@app.get("/health")
+async def health():
+    return {
+        "status": "healthy",
+        "service": "TripMind API",
+        "version": "1.0.0"
     }
 
 
