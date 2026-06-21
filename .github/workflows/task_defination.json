@@ -13,10 +13,10 @@
       "essential": true,
       "portMappings": [
         {
-          "containerPort": 8080,
-          "hostPort": 8080,
+          "containerPort": 8000,
+          "hostPort": 8000,
           "protocol": "tcp",
-          "name": "tripmind-8080",
+          "name": "tripmind-8000",
           "appProtocol": "http"
         }
       ],
