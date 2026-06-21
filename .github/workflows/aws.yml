@@ -24,7 +24,7 @@ on:
 
 # ── Global Environment Variables ──────────────────────────────────────────────
 env:
-  AWS_REGION:         us-east-1
+  AWS_REGION:         ap-southeast-2
   ECR_REPOSITORY:     tripmind-app
   ECS_SERVICE:        tripmind-live-service
   ECS_CLUSTER:        tripmind-llmops-cluster
