@@ -8,7 +8,7 @@
   "containerDefinitions": [
     {
       "name": "tripmind-live-container",
-      "image": "982689564929.dkr.ecr.us-east-1.amazonaws.com/tripmind-app",
+      "image": "982689564929.dkr.ecr.ap-southeast-2.amazonaws.com/tripmind-app",
       "cpu": 1024,
       "essential": true,
       "portMappings": [
@@ -29,14 +29,14 @@
       "secrets": [
         {
           "name": "apikeyliveclass",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:982689564929:secret:llmops-Wz81Rv"
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-2:982689564929:secret:llmops-Wz81Rv"
         }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/llmopstdlive",
-          "awslogs-region": "us-east-1",
+          "awslogs-region": "ap-southeast-2",
           "awslogs-stream-prefix": "ecs",
           "awslogs-create-group": "true"
         }
