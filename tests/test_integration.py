@@ -540,12 +540,12 @@ class TestFastAPIEndpointIntegration:
     """
 
     def test_health_check_returns_ok(self, api_client):
-        """GET / should return status=ok."""
+        """GET /health should return status=healthy."""
         client, _ = api_client
-        response = client.get("/")
+        response = client.get("/health")
         assert response.status_code == 200
         data = response.json()
-        assert data["status"] == "ok"
+        assert data["status"] == "healthy"
         assert "TripMind" in data["service"]
 
     def test_query_endpoint_returns_200(self, api_client):
@@ -597,9 +597,10 @@ class TestFastAPIEndpointIntegration:
         assert response.status_code == 422
 
     def test_health_check_returns_service_name(self, api_client):
-        """Health check response must identify the service."""
+        """GET /health response must identify the service."""
         client, _ = api_client
-        response = client.get("/")
+        response = client.get("/health")
+        assert response.status_code == 200
         data = response.json()
         assert "service" in data
 
