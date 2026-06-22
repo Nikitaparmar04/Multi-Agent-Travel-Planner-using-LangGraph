@@ -1,37 +1,42 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from agent.agentic_workflow import GraphBuilder
 import traceback
+import os
 
 app = FastAPI(
     title="TripMind API",
     version="1.0"
 )
 
-# CORS Configuration
+# ── CORS ──────────────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Production me specific domains use karna
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# ── Static files (CSS, JS, assets) ────────────────────────────────────────────
+# Serves the frontend/ directory under /static so:
+#   GET /static/style.css  → /app/frontend/style.css
+#   GET /static/app.js     → /app/frontend/app.js
+FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "frontend")
+app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
-# Request Model
-class QueryRequest(BaseModel):
-    query: str
 
-
-# Root Endpoint
-@app.get("/")
+# ── Root: serve index.html ────────────────────────────────────────────────────
+# IMPORTANT: This must be defined AFTER app.mount("/static", ...) to avoid
+# the static mount intercepting the root path.
+@app.get("/", response_class=HTMLResponse)
 async def root():
-    return {
-        "status": "ok",
-        "service": "TripMind API"
-    }
+    index_path = os.path.join(FRONTEND_DIR, "index.html")
+    with open(index_path, "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read(), status_code=200)
 
 
 # ── Dedicated Health Check Endpoint (used by Docker HEALTHCHECK) ──────────────
@@ -46,7 +51,12 @@ async def health():
     }
 
 
-# Main Query Endpoint
+# ── Request Model ─────────────────────────────────────────────────────────────
+class QueryRequest(BaseModel):
+    query: str
+
+
+# ── Main Query Endpoint ───────────────────────────────────────────────────────
 @app.post("/query")
 async def query_travel_agent(request: QueryRequest):
     try:

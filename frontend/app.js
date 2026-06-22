@@ -2,7 +2,7 @@
    TripMind — app.js
    ========================================= */
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = ""; // relative path — works on localhost AND production ECS URL
 
 /* ── State ─────────────────────────────── */
 let sessions = [];          // [{id, title, messages:[]}]
